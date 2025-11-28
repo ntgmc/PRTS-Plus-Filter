@@ -1,4 +1,4 @@
-# PRTS Plus 干员持有筛选 (Operator Possession Filter)
+# PRTS Plus 干员持有筛选 (PRTS-Plus-Filter)
 
 > 为 [zoot.plus](https://zoot.plus/) 作业查询提供基于“干员持有率”的智能筛选功能。支持“完美持有”与“助战模式”，深度适配原生 UI 及暗黑模式。
 
@@ -25,7 +25,7 @@
 ## 📥 安装方法 | Installation
 
 1.  安装浏览器扩展 [Tampermonkey](https://www.tampermonkey.net/) (油猴)。
-2.  [**点击这里安装脚本**](https://github.com/ntgmc/Better-PRTS-Plus/blob/main/PRTS%20Plus%20%E5%B9%B2%E5%91%98%E6%8C%81%E6%9C%89%E7%AD%9B%E9%80%89.user.js)。
+2.  [**点击这里安装脚本**](https://github.com/ntgmc/PRTS-Plus-Filter/blob/main/PRTS%20Plus%20%E5%B9%B2%E5%91%98%E6%8C%81%E6%9C%89%E7%AD%9B%E9%80%89.user.js)。
 3.  打开 [zoot.plus](https://zoot.plus/) 即可看到筛选按钮出现在搜索框下方。
 
 ## 🛠️ 使用说明 | Usage
