@@ -77,4 +77,3 @@
 
 ---
 *Disclaimer: This script is a third-party tool and is not affiliated with HyperGryph or zoot.plus.*
-```
