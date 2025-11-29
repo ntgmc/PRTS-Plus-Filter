@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         PRTS Plus 干员持有筛选
 // @namespace    http://tampermonkey.net/
-// @version      2.7
-// @description  在 zoot.plus 搜索作业时，支持“完美持有”和“允许助战”双模式筛选。已屏蔽 create 和 editor 页面，支持日夜模式自动切换。
+// @version      2.8
+// @description  在 zoot.plus 搜索作业时，支持“完美持有”和“允许助战”双模式筛选。
 // @author       一只摆烂的42 & Gemini 3 pro
 // @match        https://zoot.plus/*
 // @exclude      https://zoot.plus/create*
@@ -20,7 +20,7 @@
     const adaptiveStyle = `
         /* 容器布局 */
         #prts-filter-bar {
-            margin-top: 16px !important;
+            margin-top: 12px !important;
             margin-bottom: 8px !important;
             display: flex;
             flex-wrap: wrap;
@@ -28,7 +28,7 @@
             width: 100%;
         }
 
-        /* 按钮基础样式 (全模式通用架构) */
+        /* 按钮基础样式 */
         .prts-btn {
             display: inline-flex !important;
             align-items: center !important;
@@ -38,11 +38,9 @@
             font-size: 0.875rem !important;
             font-weight: 600 !important;
             line-height: 1.25rem !important;
-            border-radius: 0.375rem !important; /* 统一圆角 */
+            border-radius: 0.375rem !important;
             cursor: pointer !important;
             transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
-
-            /* 默认日间配色 */
             background-color: #f6f7f9;
             color: #1c2127;
             box-shadow: inset 0 0 0 1px rgba(17, 20, 24, 0.2), 0 1px 2px rgba(17, 20, 24, 0.1);
@@ -131,18 +129,15 @@
     // --- 工具：检测当前页面是否应该禁用脚本 ---
     function isPageDisabled() {
         const path = window.location.pathname;
-        // 如果路径以 /create 或 /editor 开头，则禁用
         return path.startsWith('/create') || path.startsWith('/editor');
     }
 
     // --- 初始化 ---
     function init() {
-        // 如果初始加载就在禁用页面，直接不执行
         if (isPageDisabled()) return;
-
         loadOwnedOps();
         injectControls();
-        observePageChanges(); // 必须保留监听，以便从 create 页面返回首页时重新激活
+        observePageChanges();
     }
 
     // --- 数据处理 ---
@@ -185,7 +180,6 @@
 
     // --- 界面注入 ---
     function injectControls() {
-        // 1. 运行时检测：如果当前是 create/editor 页面，尝试移除控件并退出
         if (isPageDisabled()) {
             const existingBar = document.getElementById('prts-filter-bar');
             if (existingBar) existingBar.remove();
@@ -205,7 +199,6 @@
             controlBar.id = 'prts-filter-bar';
 
             const btnClass = 'prts-btn';
-
             const createBtn = (text, icon, onClick, id) => {
                 const btn = document.createElement('button');
                 btn.className = btnClass;
@@ -244,24 +237,26 @@
         const supportBtn = document.getElementById('btn-support');
         if (!perfectBtn || !supportBtn) return;
 
+        perfectBtn.classList.remove('prts-active');
+        supportBtn.classList.remove('prts-active');
+
         if (currentFilterMode === 'PERFECT') {
             perfectBtn.classList.add('prts-active');
-            supportBtn.classList.remove('prts-active');
         } else if (currentFilterMode === 'SUPPORT') {
             supportBtn.classList.add('prts-active');
-            perfectBtn.classList.remove('prts-active');
-        } else {
-            perfectBtn.classList.remove('prts-active');
-            supportBtn.classList.remove('prts-active');
         }
     }
 
-    // --- 筛选逻辑 ---
+    // --- 筛选逻辑 (核心修复) ---
     function applyFilter() {
-        // 同样在执行筛选前检查，如果是禁用页面则不执行
         if (isPageDisabled()) return;
 
-        const cards = document.querySelectorAll('ul.grid > li');
+        // 同时支持 Grid 和 List 视图的选择器
+        let cards = document.querySelectorAll('ul.grid > li');
+        if (cards.length === 0) {
+             cards = document.querySelectorAll('.tabular-nums ul > li');
+        }
+
         if (cards.length === 0) return;
 
         cards.forEach(card => {
@@ -277,11 +272,31 @@
             let requiredOps = [];
 
             tags.forEach(tag => {
+                // 修复 1: 列表模式下，关卡标题（如 OS-S-1）也被包在 .bp4-tag 中，且内部包含 h4。
+                // 如果发现标签内有 h4，则判定为关卡标题，直接跳过。
+                if (tag.querySelector('h4')) return;
+
                 const text = tag.innerText.trim();
-                if (['普通', '突袭', 'Beta', '活动关卡'].includes(text) ||
-                    text.includes('|') || text.startsWith('[') || text.includes('更新')) return;
-                const opName = text.split(' ')[0];
-                if (opName && !['json', '作者'].includes(opName)) requiredOps.push(opName);
+
+                // 修复 2: 增加过滤词 '活动关卡' 的 includes 判断 (列表模式下它可能和标题连在一起)
+                // 修复 3: 增加过滤 '医疗'、'奶' 等常见非干员标签
+                if (['普通', '突袭', 'Beta'].includes(text) ||
+                    text.includes('活动关卡') ||
+                    text.includes('剿灭') ||
+                    text.includes('危机合约') ||
+                    text.includes('|') ||
+                    text.startsWith('[') ||
+                    text.includes('更新') ||
+                    text.includes('医疗') ||
+                    text.includes('奶')) return;
+
+                // 修复 4: 使用正则分割空白字符（兼容列表模式下的换行符）
+                const opName = text.split(/\s+/)[0];
+
+                // 排除干扰项
+                if (opName && !['json', '作者'].includes(opName)) {
+                    requiredOps.push(opName);
+                }
             });
 
             let missingCount = 0;
@@ -310,8 +325,12 @@
     }
 
     function addSupportLabel(cardLi, opName) {
+        // 在 List 视图中，需要找到深层的 .bp4-card
         const cardInner = cardLi.querySelector('.bp4-card');
         if (!cardInner) return;
+
+        if (cardInner.querySelector('.prts-support-label')) return;
+
         const label = document.createElement('div');
         label.className = 'prts-support-label';
         label.innerHTML = `<span class="bp4-icon" style="margin-right:6px;">🆘</span>需助战: ${opName}`;
@@ -321,12 +340,10 @@
     // --- 监听动态加载 ---
     function observePageChanges() {
         const observer = new MutationObserver((mutations) => {
-            // 每次页面变动，都重新检查路径。
-            // 这样可以在用户从首页跳转到 create 时自动销毁按钮。
             if (isPageDisabled()) {
                 const existingBar = document.getElementById('prts-filter-bar');
                 if (existingBar) existingBar.remove();
-                return; // 直接返回，不再执行筛选
+                return;
             }
 
             let isScriptAction = false;
@@ -341,9 +358,6 @@
                             hasMeaningfulChange = true;
                         }
                     }
-                }
-                for (const node of mutation.removedNodes) {
-                    if (node.nodeType === 1 && node.classList.contains('prts-support-label')) isScriptAction = true;
                 }
             }
 
@@ -361,6 +375,6 @@
         observer.observe(document.body, { childList: true, subtree: true });
     }
 
-    setTimeout(init, 2000);
+    setTimeout(init, 1000);
 
 })();
