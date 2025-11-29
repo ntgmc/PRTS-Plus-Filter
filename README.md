@@ -2,7 +2,7 @@
 
 > 为 [zoot.plus](https://zoot.plus/) 作业查询提供基于“干员持有率”的智能筛选功能。支持“完美持有”与“助战模式”，深度适配原生 UI 及[PRTS Plus 更好的暗黑模式](https://github.com/ntgmc/PRTS-Plus-Darkmode)。
 
-![Version](https://img.shields.io/badge/Version-2.7-blue) ![Author](https://img.shields.io/badge/Author-一只摆烂的42_%26_Gemini_3_pro-orange)
+![Version](https://img.shields.io/badge/Version-2.8-blue) ![Author](https://img.shields.io/badge/Author-一只摆烂的42_%26_Gemini_3_pro-orange)
 
 ## 📖 简介 | Introduction
 
