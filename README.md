@@ -1,3 +1,19 @@
+# ⚠️ 项目已迁移 / Project Moved
+
+> [!CAUTION]
+> **本项目已停止维护 (Deprecated)**
+> 
+> 本脚本的所有功能（包括干员持有筛选、助战模式等）已与暗黑模式合并，并迁移至新的整合仓库：
+> **👉 [ntgmc/Better-PRTS-Plus](https://github.com/ntgmc/Better-PRTS-Plus)**
+> 
+> 请前往新仓库下载最新版本的 **Better-PRTS-Plus** 脚本以获取最佳体验及后续更新。
+>
+> This repository is no longer maintained. All features have been integrated into **[Better-PRTS-Plus](https://github.com/ntgmc/Better-PRTS-Plus)**.
+
+---
+
+*(以下为原项目文档 / The following is the legacy documentation)*
+
 # PRTS Plus 干员持有筛选 (PRTS-Plus-Filter)
 
 > 为 [zoot.plus](https://zoot.plus/) 作业查询提供基于“干员持有率”的智能筛选功能。支持“完美持有”与“助战模式”，提供**视觉降级**与**隐藏**双重显示模式，深度适配原生 UI 及[PRTS Plus 更好的暗黑模式](https://github.com/ntgmc/PRTS-Plus-Darkmode)。
@@ -69,11 +85,6 @@
 *   **浏览器**：Chrome, Edge, Firefox (需安装 Tampermonkey)
 *   **视图**：支持 Grid (网格) 和 List (列表/单列) 模式。
 *   **配套脚本**：本脚本已深度适配 [**PRTS Plus 更好的暗黑模式**](https://github.com/ntgmc/PRTS-Plus-Darkmode) 脚本，两者同时使用效果最佳。
-
-## 👨‍💻 作者
-
-*   **一只摆烂的42**
-*   **Gemini 3 pro** (AI Designer)
 
 ---
 *Disclaimer: This script is a third-party tool and is not affiliated with HyperGryph or zoot.plus.*
